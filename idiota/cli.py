@@ -51,6 +51,10 @@ def parse_args ():
     show_parser.set_defaults (func=show)
     show_parser.add_argument ('oid', default='@', type=oid, nargs='?')
 
+    diff_parser = commands.add_parser ('diff')
+    diff_parser.set_defaults (func=_diff)
+    diff_parser.add_argument ('commit', default='@', type=oid, nargs='?')
+
     checkout_parser = commands.add_parser ('checkout')
     checkout_parser.set_defaults (func=checkout)
     checkout_parser.add_argument ('commit')
@@ -74,6 +78,10 @@ def parse_args ():
     reset_parser = commands.add_parser ('reset')
     reset_parser.set_defaults (func=reset)
     reset_parser.add_argument ('commit', type=oid)
+
+    merge_parser = commands.add_parser ('merge')
+    merge_parser.set_defaults (func=merge)
+    merge_parser.add_argument ('commit', type=oid)
 
     return parser.parse_args ()
 
@@ -134,6 +142,14 @@ def show (args):
     sys.stdout.flush ()
     sys.stdout.buffer.write (result)
 
+def _diff (args):
+    tree = args.commit and base.get_commit (args.commit).tree
+
+    result = diff.diff_trees (base.get_tree (tree), base.get_working_tree ())
+    sys.stdout.flush ()
+    sys.stdout.buffer.write (result)
+
+
 def checkout (args):
     base.checkout (args.commit)
 
@@ -185,7 +201,16 @@ def status (args):
     else:
         print (f'HEAD detached at {HEAD[:10]}')
 
-
+    print ('\nChanges to be committed:\n')
+    HEAD_tree = HEAD and base.get_commit (HEAD).tree
+    for path, action in diff.iter_changed_files (base.get_tree (HEAD_tree),
+                                                 base.get_working_tree ()):
+        print (f'{action:>12}: {path}')
 
 def reset (args):
     base.reset (args.commit)
+
+
+
+def merge (args):
+    base.merge (args.commit)
