@@ -2,8 +2,19 @@ import os
 import hashlib
 
 from collections import namedtuple
-GIT_DIR = '.idiota'
+from contextlib import contextmanager
 
+
+GIT_DIR = None
+
+
+@contextmanager
+def change_git_dir (new_dir):
+    global GIT_DIR
+    old_dir = GIT_DIR
+    GIT_DIR = f'{new_dir}/.idiota'
+    yield
+    GIT_DIR = old_dir
 
 def init ():
     os.makedirs (GIT_DIR)
