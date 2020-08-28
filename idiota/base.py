@@ -12,28 +12,37 @@ def init ():
     data.update_ref ('HEAD', data.RefValue (symbolic=True, value='refs/heads/master'))
 
 
-def write_tree (directory='.'):
-    entries = []
-    with os.scandir (directory) as it:
-        for entry in it:
-            full = f'{directory}/{entry.name}'
-            if is_ignored (full):
-                continue
+def write_tree ():
+    # Index is flat, we need it as a tree of dicts
+    index_as_tree = {}
+    with data.get_index () as index:
+        for path, oid in index.items ():
+            path = path.split ('/')
+            dirpath, filename = path[:-1], path[-1]
 
-            if entry.is_file (follow_symlinks=False):
-                type_ = 'blob'
-                with open (full, 'rb') as f:
-                     oid = data.hash_object (f.read ())
-                
-            elif entry.is_dir (follow_symlinks=False):
+            current = index_as_tree
+            # Find the dict for the directory of this file
+            for dirname in dirpath:
+                current = current.setdefault (dirname, {})
+            current[filename] = oid
+
+    def write_tree_recursive (tree_dict):
+        entries = []
+        for name, value in tree_dict.items ():
+            if type (value) is dict:
                 type_ = 'tree'
-                oid = write_tree (full)
-            entries.append ((entry.name, oid, type_))
+                oid = write_tree_recursive (value)
+            else:
+                type_ = 'blob'
+                oid = value
+            entries.append ((name, oid, type_))
 
-    tree = ''.join (f'{type_} {oid} {name}\n'
-                    for name, oid, type_
-                    in sorted (entries))
-    return data.hash_object (tree.encode (), 'tree')
+        tree = ''.join (f'{type_} {oid} {name}\n'
+                        for name, oid, type_
+                        in sorted (entries))
+        return data.hash_object (tree.encode (), 'tree')
+
+    return write_tree_recursive (index_as_tree)
 
 def _iter_tree_entries (oid):
     if not oid:
@@ -69,6 +78,11 @@ def get_working_tree ():
                 result[path] = data.hash_object (f.read ())
     return result
 
+def get_index_tree ():
+    with data.get_index () as index:
+        return index
+
+
 
 def _empty_current_directory ():
     for root, _, filenames in os.walk ('.'):
@@ -79,20 +93,34 @@ def _empty_current_directory ():
             os.remove (path)
 
 
-def read_tree (tree_oid):
-    _empty_current_directory ()
-    for path, oid in get_tree (tree_oid, base_path='./').items ():
-        os.makedirs (os.path.dirname (path), exist_ok=True)
-        with open (path, 'wb') as f:
-            f.write (data.get_object (oid))
+def read_tree (tree_oid, update_working=False):
+    with data.get_index () as index:
+        index.clear ()
+        index.update (get_tree (tree_oid))
 
-def read_tree_merged (t_base, t_HEAD, t_other):
+        if update_working:
+            _checkout_index (index)
+
+
+def read_tree_merged (t_base, t_HEAD, t_other, update_working=False):
+    with data.get_index () as index:
+        index.clear ()
+        index.update (diff.merge_trees (
+            get_tree (t_base),
+            get_tree (t_HEAD),
+            get_tree (t_other)
+        ))
+
+        if update_working:
+            _checkout_index (index)
+
+
+def _checkout_index (index):
     _empty_current_directory ()
-    for path, blob in diff.merge_trees (
-            get_tree (t_base), get_tree (t_HEAD), get_tree (t_other)).items ():
-        os.makedirs (f'./{os.path.dirname (path)}', exist_ok=True)
+    for path, oid in index.items ():
+        os.makedirs (os.path.dirname (f'./{path}'), exist_ok=True)
         with open (path, 'wb') as f:
-            f.write (blob)
+            f.write (data.get_object (oid, 'blob'))
 
 def commit (message):
     commit = f'tree {write_tree ()}\n'
@@ -118,7 +146,7 @@ def commit (message):
 def checkout (name):
     oid = get_oid (name)
     commit = get_commit (oid)
-    read_tree (commit.tree)
+    read_tree (commit.tree, update_working=True)
 
 
     if is_branch (name):
@@ -139,7 +167,7 @@ def merge (other):
 
     # Handle fast-forward merge
     if merge_base == HEAD:
-        read_tree (c_other.tree)
+        read_tree (c_other.tree, update_working=True)
         data.update_ref ('HEAD',
                          data.RefValue (symbolic=False, value=other))
         print ('Fast-forward merge, no need to commit')
@@ -149,7 +177,7 @@ def merge (other):
 
     c_base = get_commit (merge_base)
     c_HEAD = get_commit (HEAD)
-    read_tree_merged (c_base.tree, c_HEAD.tree, c_other.tree)
+    read_tree_merged (c_base.tree, c_HEAD.tree, c_other.tree, update_working=True)
     print ('Merged in working tree\nPlease commit')
 
 
@@ -217,7 +245,7 @@ def iter_commits_and_parents (oids):
         oids.extendleft (commit.parents[:1])
         # Return other parents later
         oids.extend (commit.parents[1:])
-        
+
 def iter_objects_in_commits (oids):
     # N.B. Must yield the oid before acccessing it (to allow caller to fetch it
     # if needed)
@@ -260,6 +288,32 @@ def get_oid (name):
         return name
 
     assert False, f'Unknown name {name}'
+
+
+def add (filenames):
+
+    def add_file (filename):
+        # Normalize path
+        filename = os.path.relpath (filename)
+        with open (filename, 'rb') as f:
+            oid = data.hash_object (f.read ())
+        index[filename] = oid
+
+    def add_directory (dirname):
+        for root, _, filenames in os.walk (dirname):
+            for filename in filenames:
+                # Normalize path
+                path = os.path.relpath (f'{root}/{filename}')
+                if is_ignored (path) or not os.path.isfile (path):
+                    continue
+                add_file (path)
+
+    with data.get_index () as index:
+        for name in filenames:
+            if os.path.isfile (name):
+                add_file (name)
+            elif os.path.isdir (name):
+                add_directory (name)
 
 def is_ignored (path):
     return '.idiota' in path.split ('/')
