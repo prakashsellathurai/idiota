@@ -96,10 +96,15 @@ def commit (args):
     print (base.commit (args.message))\
 
 def log (args):
+    refs = {}
+    for refname, ref in data.iter_refs ():
+        refs.setdefault (ref.value, []).append (refname)
+
     for oid in base.iter_commits_and_parents ({args.oid}):
         commit = base.get_commit (oid)
 
-        print (f'commit {oid}\n')
+        refs_str = f' ({", ".join (refs[oid])})' if oid in refs else ''
+        print (f'commit {oid}{refs_str}\n')
         print (textwrap.indent (commit.message, '    '))
         print ('')
 
@@ -121,7 +126,7 @@ def branch (args):
         print (f'Branch {args.name} created at {args.start_point[:10]}')
 
 
-        
+
 def k (args):
     dot = 'digraph commits {\n'
     oids = set ()
