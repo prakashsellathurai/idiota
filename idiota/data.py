@@ -16,10 +16,15 @@ def update_ref (ref, oid):
 
 def get_ref (ref):
     ref_path = f'{GIT_DIR}/{ref}'
+    value = None
     if os.path.isfile (ref_path):
         with open (ref_path) as f:
-            return f.read ().strip ()
+            value = f.read ().strip ()
 
+    if value and value.startswith ('ref:'):
+        return get_ref (value.split (':', 1)[1].strip ())
+
+    return value
 def iter_refs ():
     refs = ['HEAD']
     for root, _, filenames in os.walk (f'{GIT_DIR}/refs/'):
@@ -28,7 +33,7 @@ def iter_refs ():
 
     for refname in refs:
         yield refname, get_ref (refname)
-        
+
 def hash_object (data, type_='blob'):
     obj = type_.encode () + b'\x00' + data
     oid = hashlib.sha1 (obj).hexdigest ()
