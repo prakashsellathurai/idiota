@@ -88,15 +88,13 @@ def commit (args):
     print (base.commit (args.message))\
 
 def log (args):
-    oid = args.oid
-    while oid:
+    for oid in base.iter_commits_and_parents ({args.oid}):
         commit = base.get_commit (oid)
 
         print (f'commit {oid}\n')
         print (textwrap.indent (commit.message, '    '))
         print ('')
 
-        oid = commit.parent
 
 def checkout (args):
     base.checkout (args.oid)
@@ -120,7 +118,7 @@ def k (args):
 
     dot += '}'
     print (dot)
-        with subprocess.Popen (
-            ['dot', '-Tgtk', '/dev/stdin'],
-            stdin=subprocess.PIPE) as proc:
-        proc.communicate (dot.encode ())
+    with subprocess.Popen (
+        ['dot', '-Tgtk', '/dev/stdin'],
+        stdin=subprocess.PIPE) as proc:
+    proc.communicate (dot.encode ())
