@@ -157,11 +157,10 @@ def get_branch_name ():
     return os.path.relpath (HEAD, 'refs/heads')
 
 
-Commit = namedtuple ('Commit', ['tree', 'parent', 'message'])
-
+Commit = namedtuple ('Commit', ['tree', 'parents', 'message'])
 
 def get_commit (oid):
-    parent = None
+    parents = []
 
     commit = data.get_object (oid, 'commit').decode ()
     lines = iter (commit.splitlines ())
@@ -170,12 +169,12 @@ def get_commit (oid):
         if key == 'tree':
             tree = value
         elif key == 'parent':
-            parent = value
+            parents = []
         else:
             assert False, f'Unknown field {key}'
 
     message = '\n'.join (lines)
-    return Commit (tree=tree, parent=parent, message=message)
+    return Commit (tree=tree, parents=parents, message=message)
 
 def iter_commits_and_parents (oids):
     oids = deque (oids)
@@ -189,8 +188,10 @@ def iter_commits_and_parents (oids):
         yield oid
 
         commit = get_commit (oid)
-        # Return parent next
-        oids.appendleft (commit.parent)
+        # Return first parent next
+        oids.extendleft (commit.parents[:1])
+        # Return other parents later
+        oids.extend (commit.parents[1:])
 
 def get_oid (name):
     if name == '@': name = 'HEAD'
