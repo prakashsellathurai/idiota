@@ -100,6 +100,10 @@ def commit (message):
 
     if HEAD:
         commit += f'parent {HEAD}\n'
+    MERGE_HEAD = data.get_ref ('MERGE_HEAD').value
+    if MERGE_HEAD:
+        commit += f'parent {MERGE_HEAD}\n'
+        data.delete_ref ('MERGE_HEAD', deref=False)
 
     commit += '\n'
     commit += f'{message}\n'
@@ -132,8 +136,10 @@ def merge (other):
     c_HEAD = get_commit (HEAD)
     c_other = get_commit (other)
 
+    data.update_ref ('MERGE_HEAD', data.RefValue (symbolic=False, value=other))
+
     read_tree_merged (c_HEAD.tree, c_other.tree)
-    print ('Merged in working tree')
+    print ('Merged in working tree\nPlease commit')
 
 def create_tag (name, oid):
     data.update_ref (f'refs/tags/{name}', data.RefValue (symbolic=False, value=oid))
