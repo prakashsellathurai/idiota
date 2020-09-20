@@ -3,7 +3,7 @@ idiota is a minimal version control system built on
 python
 
 ![PyPI](https://img.shields.io/pypi/v/idiota)
-
+![Upload Python Package](https://github.com/prakashsellathurai/idiota/workflows/Upload%20Python%20Package/badge.svg)
 
 ## Documentation
 check /Doc for code documentation
