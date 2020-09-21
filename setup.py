@@ -6,7 +6,7 @@ with open('README.md') as f:
     long_description = f.read()
 
 setup(name='idiota',
-      version='3.0',
+      version='4.0',
       packages=['idiota'],
       entry_points={
            'console_scripts': [
