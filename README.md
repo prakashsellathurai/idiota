@@ -9,6 +9,10 @@ this project is to be a stupidly simple version control system(vcs).
 ![PyPI](https://img.shields.io/pypi/v/idiota)
 ![Upload Python Package](https://github.com/prakashsellathurai/idiota/workflows/Upload%20Python%20Package/badge.svg)
 
+## Development:
+For development purposes.To setup the package in your local environment  Run 
+
+``python setup.py develop``
 ## Documentation
 check /Doc for code documentation
 

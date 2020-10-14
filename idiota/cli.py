@@ -9,99 +9,108 @@ from . import diff
 from . import remote
 
 def main ():
+    """
+    Main entry point.
+    """
     with data.change_git_dir ('.'):
         args = parse_args ()
         args.func (args)
 
+
+    
 def parse_args ():
-    parser = argparse.ArgumentParser ()
+    """
+    Parse command line arguments.
+    """
+    
+    parser = argparse.ArgumentParser (formatter_class=argparse.RawTextHelpFormatter)
 
-    commands = parser.add_subparsers (dest='command')
+    commands = parser.add_subparsers (dest='command', required=True,    metavar='COMMAND', help='description')
     commands.required = True
-
+    
     oid = base.get_oid
 
-    init_parser = commands.add_parser ('init')
+    init_parser = commands.add_parser ('init', help='Initialize a new git repository')
     init_parser.set_defaults (func=init)
 
-    hash_object_parser = commands.add_parser ('hash-object')
+    hash_object_parser = commands.add_parser ('hashobject', help='Compute object ID', aliases=['hash-object'])
     hash_object_parser.set_defaults (func=hash_object)
-    hash_object_parser.add_argument ('file')
+    hash_object_parser.add_argument ('file',help='File to hash')
 
-    cat_file_parser = commands.add_parser ('cat-file')
+    cat_file_parser = commands.add_parser ('catfile', help='Print object contents', aliases=['cat-file'])
     cat_file_parser.set_defaults (func=cat_file)
-    cat_file_parser.add_argument ('object', type=oid)
+    cat_file_parser.add_argument ('object', type=oid,help='Object to cat')
 
-    write_tree_parser = commands.add_parser ('write-tree')
+    write_tree_parser = commands.add_parser ('writetree', help='Write tree object', aliases=['write-tree'])
     write_tree_parser.set_defaults (func=write_tree)
 
-    read_tree_parser = commands.add_parser ('read-tree')
+    read_tree_parser = commands.add_parser ('readtree', help='Read tree object', aliases=['read-tree'])
     read_tree_parser.set_defaults (func=read_tree)
-    read_tree_parser.add_argument ('tree', type=oid)
+    read_tree_parser.add_argument ('tree', type=oid,help='Tree to read')
 
 
-    commit_parser = commands.add_parser ('commit')
+    commit_parser = commands.add_parser ('commit', help='Commit changes', aliases=['ci'])
     commit_parser.set_defaults (func=commit)
-    commit_parser.add_argument ('-m', '--message', required=True)
+    commit_parser.add_argument ('-m', '--message', required=True,help='Commit message(required)')
 
-    log_parser = commands.add_parser ('log')
+    log_parser = commands.add_parser ('log', help='Show commit log', aliases=['lo'])
     log_parser.set_defaults (func=log)
-    log_parser.add_argument ('oid', default='@', type=oid, nargs='?')
+    log_parser.add_argument ('oid', default='@', type=oid, nargs='?',help='Commit to log from')
 
-    show_parser = commands.add_parser ('show')
+    show_parser = commands.add_parser ('show', help='Show commit', aliases=['sh'])
     show_parser.set_defaults (func=show)
-    show_parser.add_argument ('oid', default='@', type=oid, nargs='?')
+    show_parser.add_argument ('oid', default='@', type=oid, nargs='?',help='Commit to show')
 
-    diff_parser = commands.add_parser ('diff')
+    diff_parser = commands.add_parser ('diff', help='Show diff', aliases=['di'])
     diff_parser.set_defaults (func=_diff)
-    diff_parser.add_argument ('--cached', action='store_true')
-    diff_parser.add_argument ('commit', nargs='?')
+    diff_parser.add_argument ('--cached', action='store_true',help='Diff against index')
+    diff_parser.add_argument ('commit', nargs='?', type=oid,help='Commit to diff from')
 
-    checkout_parser = commands.add_parser ('checkout')
+    checkout_parser = commands.add_parser ('checkout', aliases=['co'])
     checkout_parser.set_defaults (func=checkout)
-    checkout_parser.add_argument ('commit')
+    checkout_parser.add_argument ('commit', type=oid,help='Commit to checkout')
 
-    tag_parser = commands.add_parser ('tag')
+    tag_parser = commands.add_parser ('tag', help='Create a tag', aliases=['ta'])
     tag_parser.set_defaults (func=tag)
-    tag_parser.add_argument ('name')
-    tag_parser.add_argument ('oid', default='@', type=oid, nargs='?')
+    tag_parser.add_argument ('name', help='Tag name')
+    tag_parser.add_argument ('oid', default='@', type=oid, nargs='?',help='Commit to tag from')
 
-    branch_parser = commands.add_parser ('branch')
+    branch_parser = commands.add_parser ('branch', help='Create a branch', aliases=['br'])
     branch_parser.set_defaults (func=branch)
     branch_parser.add_argument ('name', nargs='?')
-    branch_parser.add_argument ('start_point', default='@', type=oid, nargs='?')
+    branch_parser.add_argument ('start_point', default='@', type=oid, nargs='?',help='Commit to start branch from')
 
-    k_parser = commands.add_parser ('k')
+    k_parser = commands.add_parser ('k', help='Create a key', aliases=['ke'])
     k_parser.set_defaults (func=k)
 
-    status_parser = commands.add_parser ('status')
+    status_parser = commands.add_parser ('status', help='Show status', aliases=['st'])
     status_parser.set_defaults (func=status)
 
-    reset_parser = commands.add_parser ('reset')
+    reset_parser = commands.add_parser ('reset', help='Reset to commit', aliases=['re'])
     reset_parser.set_defaults (func=reset)
-    reset_parser.add_argument ('commit', type=oid)
+    reset_parser.add_argument ('commit', type=oid,help='Commit to reset to')
 
-    merge_parser = commands.add_parser ('merge')
+    merge_parser = commands.add_parser ('merge', help='Merge commit', aliases=['me'])
     merge_parser.set_defaults (func=merge)
-    merge_parser.add_argument ('commit', type=oid)
+    merge_parser.add_argument ('commit', type=oid,help='Commit to merge')
 
-    merge_base_parser = commands.add_parser ('merge-base')
+    merge_base_parser = commands.add_parser ('mergebase', help='Find merge base', aliases=['mb'])
     merge_base_parser.set_defaults (func=merge_base)
-    merge_base_parser.add_argument ('commit1', type=oid)
-    merge_base_parser.add_argument ('commit2', type=oid)
+    merge_base_parser.add_argument ('commit1', type=oid,help='Commit to find merge base from')
+    merge_base_parser.add_argument ('commit2', type=oid,help='Commit to find merge base to')
 
-    fetch_parser = commands.add_parser ('fetch')
+    fetch_parser = commands.add_parser ('fetch', help='Fetch remote', aliases=['fe'])
     fetch_parser.set_defaults (func=fetch)
-    fetch_parser.add_argument ('remote')
+    fetch_parser.add_argument ('remote', help='Remote to fetch from')
 
-    push_parser = commands.add_parser ('push')
+    push_parser = commands.add_parser ('push', help='Push to remote', aliases=['pu'])
     push_parser.set_defaults (func=push)
-    push_parser.add_argument ('remote')
-    push_parser.add_argument ('branch')
+    push_parser.add_argument ('remote', help='Remote to push to')
+    push_parser.add_argument ('branch', nargs='?', help='Branch to push')
 
-    add_parser = commands.add_parser ('add')
+    add_parser = commands.add_parser ('add', help='Add file to index', aliases=['ad'])
     add_parser.set_defaults (func=add)
-    add_parser.add_argument ('files', nargs='+')
+    add_parser.add_argument ('files', nargs='+', help='Files to add')
 
     return parser.parse_args ()
 
