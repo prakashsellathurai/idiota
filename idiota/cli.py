@@ -1,3 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+cli.py: Command line interface for idiota.
+"""
+__author__ = "prakashsellathurai"
+__copyright__ = "Copyright 2021"
+__version__ = "1.0.1"
+__email__ = "prakashsellathurai@gmail.com"
+
 import argparse
 import sys
 import subprocess

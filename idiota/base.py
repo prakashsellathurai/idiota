@@ -1,3 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+base module for idiota 
+"""
+__author__ = "prakashsellathurai"
+__copyright__ = "Copyright 2021"
+__version__ = "1.0.1"
+__email__ = "prakashsellathurai@gmail.com"
+
 import itertools
 import operator
 import os
@@ -7,7 +18,11 @@ from collections import deque, namedtuple
 from . import data
 from . import diff
 
+
 def init ():
+    """
+    Initialize a new repo
+    """
     data.init ()
     data.update_ref ('HEAD', data.RefValue (symbolic=True, value='refs/heads/master'))
 
