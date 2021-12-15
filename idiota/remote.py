@@ -1,3 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Functions to handle remote repositories
+"""
+__author__ = "prakashsellathurai"
+__copyright__ = "Copyright 2021"
+__version__ = "1.0.1"
+__email__ = "prakashsellathurai@gmail.com"
+
 import os
 
 from . import base
