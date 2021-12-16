@@ -372,15 +372,23 @@ def create_branch(name, oid):
 
 
 def iter_branch_names():
+    """Iterate over the names of all branches
+    """
     for refname, _ in data.iter_refs('refs/heads/'):
         yield os.path.relpath(refname, 'refs/heads/')
 
 
 def is_branch(branch):
+    """ Check if the branch exists
+    """
     return data.get_ref(f'refs/heads/{branch}').value is not None
 
 
 def get_branch_name():
+    """Get the name of the current branch
+    returns:
+        The name of the current branch
+    """
     HEAD = data.get_ref('HEAD', deref=False)
     if not HEAD.symbolic:
         return None
@@ -393,6 +401,9 @@ Commit = namedtuple('Commit', ['tree', 'parents', 'message'])
 
 
 def get_commit(oid):
+    """
+    get commit by oid 
+    """
     parents = []
 
     commit = data.get_object(oid, 'commit').decode()
@@ -411,6 +422,9 @@ def get_commit(oid):
 
 
 def iter_commits_and_parents(oids):
+    """
+    iterator to find common ancestor among oids
+    """
     oids = deque(oids)
     visited = set()
 
@@ -475,7 +489,9 @@ def get_oid(name):
 
 
 def add(filenames):
-
+    """
+    add file hashes to index
+    """
     def add_file(filename):
         # Normalize path
         filename = os.path.relpath(filename)

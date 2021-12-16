@@ -26,12 +26,18 @@ from contextlib import contextmanager
 
 
 GIT_DIR = None
-
+RefValue = namedtuple('RefValue', ['symbolic', 'value'])
 
 @contextmanager
-def change_git_dir(new_dir):
+def change_git_dir(new_dir) -> None:
     """
     Change the current git directory
+    
+    Args:   
+        new_dir (str): new git directory
+        
+    Yields:
+        str: old git directory
     """
     global GIT_DIR
     old_dir = GIT_DIR
@@ -40,18 +46,31 @@ def change_git_dir(new_dir):
     GIT_DIR = old_dir
 
 
-def init():
+def init() -> None:
     """
     Create .idiota directory
+    
+    Returns:
+        None
     """
     os.makedirs(GIT_DIR, exist_ok=True)
     os.makedirs(f'{GIT_DIR}/objects')
 
 
-RefValue = namedtuple('RefValue', ['symbolic', 'value'])
 
 
-def update_ref(ref, value, deref=True):
+
+def update_ref(ref, value, deref: bool=True) -> None:
+    """ Update a ref
+    
+    Args:   
+        ref (str): ref name
+        value (str): ref value
+        deref (bool): dereference symbolic refs
+        
+    Returns:
+        None
+    """
     # TODO: check if ref exists
     # TODO: check if value is valid
     # TODO: check if ref is symbolic
@@ -71,7 +90,7 @@ def update_ref(ref, value, deref=True):
         f.write(value)
 
 
-def get_ref(ref, deref=True) -> str:
+def get_ref(ref, deref=True) -> RefValue:
     """ Get a ref value
 
     Args:
@@ -83,13 +102,22 @@ def get_ref(ref, deref=True) -> str:
     return _get_ref_internal(ref, deref)[1]
 
 
-def delete_ref(ref, deref=True):
+def delete_ref(ref, deref=True)->None:
     """ Delete a ref"""
     ref = _get_ref_internal(ref, deref)[0]
     os.remove(f'{GIT_DIR}/{ref}')
 
 
-def _get_ref_internal(ref, deref):
+def _get_ref_internal(ref, deref) -> RefValue:
+    """ Get a ref value
+    
+    Args:
+        ref (str): ref name
+        deref (bool): dereference symbolic refs
+    
+    Returns:
+        RefValue (str): ref value
+    """
     ref_path = f'{GIT_DIR}/{ref}'
     value = None
     if os.path.isfile(ref_path):
@@ -106,6 +134,15 @@ def _get_ref_internal(ref, deref):
 
 
 def iter_refs(prefix='', deref=True):
+    """ Iterate over refs
+    
+    Args:
+        prefix (str): ref prefix
+        deref (bool): dereference symbolic refs
+    
+    Returns:
+        Iterator[Tup(str, RefValue)]: ref name and ref value
+    """
     refs = ['HEAD', 'MERGE_HEAD']
     for root, _, filenames in os.walk(f'{GIT_DIR}/refs/'):
         root = os.path.relpath(root, GIT_DIR)
@@ -121,6 +158,11 @@ def iter_refs(prefix='', deref=True):
 
 @contextmanager
 def get_index():
+    """ Get index
+
+    Yields:
+        Index: index
+    """
     index = {}
     if os.path.isfile(f'{GIT_DIR}/index'):
         with open(f'{GIT_DIR}/index') as f:
@@ -132,7 +174,18 @@ def get_index():
         json.dump(index, f)
 
 
-def hash_object(data, type_='blob'):
+def hash_object(data: object, type_='blob')-> str:
+    """
+    Hash an object
+    
+    uses: Sha1 algorithm
+    
+    Args:
+        data (bytes): object data
+        
+    Returns:
+        str: object id
+    """
     obj = type_.encode() + b'\x00' + data
     oid = hashlib.sha1(obj).hexdigest()
     with open(f'{GIT_DIR}/objects/{oid}', 'wb') as out:
@@ -140,7 +193,17 @@ def hash_object(data, type_='blob'):
     return oid
 
 
-def get_object(oid, expected='blob'):
+def get_object(oid: str, expected='blob')-> object:
+    """
+    get an object
+    
+    Args:
+        oid (str): object id
+        
+    Returns:
+        bytes: object data
+    """
+
     with open(f'{GIT_DIR}/objects/{oid}', 'rb') as f:
         obj = f.read()
 
@@ -153,11 +216,30 @@ def get_object(oid, expected='blob'):
     return content
 
 
-def object_exists(oid):
+def object_exists(oid: bool)-> bool:
+    """ 
+    checks if object of given id exists in the repository
+    
+    Args:
+        oid (str): object id
+    
+    Returns:
+        bool: True if object exists
+    """
     return os.path.isfile(f'{GIT_DIR}/objects/{oid}')
 
 
 def fetch_object_if_missing(oid, remote_git_dir):
+    """
+    fetch object from remote repository if it is not present in local repository
+    
+    Args:
+        oid (str): object id
+        remote_git_dir (str): remote git directory
+        
+    Returns:
+        None
+    """
     if object_exists(oid):
         return
     remote_git_dir += '/.ugit'
@@ -166,6 +248,16 @@ def fetch_object_if_missing(oid, remote_git_dir):
 
 
 def push_object(oid, remote_git_dir):
+    """
+    push object to remote repository
+
+    Args:
+        oid (str): object id
+        remote_git_dir (str): remote git directory
+        
+    Returns:
+        None
+    """
     remote_git_dir += '/.ugit'
     shutil.copy(f'{GIT_DIR}/objects/{oid}',
                 f'{remote_git_dir}/objects/{oid}')
