@@ -1,0 +1,28 @@
+name: Update Docs
+
+on:
+  push: 
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Install pydoc
+      run: |
+        python -m pip install --upgrade pip
+        pip install pdoc
+    - name: generate docs
+      run: |
+        pdoc -o ./docs idiota
+    - uses: EndBug/add-and-commit@v7
+      with:
+        message: Update Docs
+        committer_name: GitHub Actions
+        committer_email: actions@github.com

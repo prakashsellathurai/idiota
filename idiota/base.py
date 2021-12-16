@@ -66,6 +66,14 @@ def write_tree():
 
 
 def _iter_tree_entries(oid):
+    """
+    Iterate over the entries in a tree
+
+    Args:
+        oid: The oid of the tree
+    Yields:
+        Tuple of (type, oid, name)
+    """
     if not oid:
         return
     tree = data.get_object(oid, 'tree')
@@ -75,6 +83,17 @@ def _iter_tree_entries(oid):
 
 
 def get_tree(oid, base_path=''):
+    """
+     Get a tree as a dictionary of path -> oid
+    
+    args:
+        oid: The oid of the tree
+        base_path: The path to prepend to the tree entries
+         default: ''
+         
+    returns:
+        A dictionary of path -> oid
+    """
     result = {}
     for type_, oid, name in _iter_tree_entries(oid):
         assert '/' not in name
@@ -90,6 +109,15 @@ def get_tree(oid, base_path=''):
 
 
 def get_working_tree():
+    """
+    Get the current working tree as a dictionary of path -> oid
+    
+    args:
+        None
+
+    Returns:
+        A dictionary of path -> oids
+    """
     result = {}
     for root, _, filenames in os.walk('.'):
         for filename in filenames:
@@ -102,11 +130,18 @@ def get_working_tree():
 
 
 def get_index_tree():
+    """
+       function to get the index tree
+
+    Returns:
+        A dictionary of path -> oid
+    """
     with data.get_index() as index:
         return index
 
 
 def _empty_current_directory():
+    """ Empty the current directory """
     for root, _, filenames in os.walk('.'):
         for filename in filenames:
             path = os.path.relpath(f'{root}/{filename}')
@@ -116,6 +151,12 @@ def _empty_current_directory():
 
 
 def read_tree(tree_oid, update_working=False):
+    """ Read a tree into the working directory 
+
+    Args:
+        tree_oid (str): The oid of the tree to read
+        update_working (bool, optional): Whether to update the working directory Defaults to False.
+    """
     with data.get_index() as index:
         index.clear()
         index.update(get_tree(tree_oid))
@@ -125,6 +166,14 @@ def read_tree(tree_oid, update_working=False):
 
 
 def read_tree_merged(t_base, t_HEAD, t_other, update_working=False):
+    """ Read a tree into the working directory
+    
+    args:
+        t_base (str): The oid of the base tree
+        t_HEAD (str): The oid of the HEAD tree
+        t_other (str): The oid of the other tree
+        update_working (bool, optional): Whether to update the working directory Defaults to False.
+    """
     with data.get_index() as index:
         index.clear()
         index.update(diff.merge_trees(
@@ -138,6 +187,20 @@ def read_tree_merged(t_base, t_HEAD, t_other, update_working=False):
 
 
 def _checkout_index(index):
+    """
+    Checkout the index into the current directory
+    
+    steps:
+        1. Empty the current directory
+        2. Write the index to the current directory
+
+
+    args:
+        index (dict): The index to checkout
+        
+    returns:
+        None
+    """
     _empty_current_directory()
     for path, oid in index.items():
         os.makedirs(os.path.dirname(f'./{path}'), exist_ok=True)
@@ -146,6 +209,21 @@ def _checkout_index(index):
 
 
 def commit(message):
+    """
+    Commit the current working tree
+    
+    steps:
+        1. Write the current working tree to the index
+        2. Write the index to the object store
+        3. Write the commit to the object store
+        4. Update the HEAD ref to point to the new commit
+        5. return the oid of the new commit
+    args:
+        message (str): The commit message
+        
+    returns:
+        The oid of the commit
+    """
     commit = f'tree {write_tree ()}\n'
 
     HEAD = data.get_ref('HEAD').value
@@ -168,6 +246,16 @@ def commit(message):
 
 
 def checkout(name):
+    """checkout the branch with name
+
+    steps:
+        1. Get the oid of the branch
+        2. Read the tree with the oid
+        3. Write the tree to the index
+        
+    Args:
+        name (str): The name of the branch to checkout
+    """
     oid = get_oid(name)
     commit = get_commit(oid)
     read_tree(commit.tree, update_working=True)
@@ -181,10 +269,33 @@ def checkout(name):
 
 
 def reset(oid):
+    """ Resets the commit to the given oid
+
+    Args:
+        oid (str): The oid to reset to
+    """
     data.update_ref('HEAD', data.RefValue(symbolic=False, value=oid))
 
 
 def merge(other):
+    """
+    Merge the other branch into the current branch
+
+    steps:
+        1. Get the oid of the other branch
+        2. Read the tree with the oid
+        3. Write the tree to the index
+        4. Write the index to the object store
+        5. Write the commit to the object store
+        6. Update the HEAD ref to point to the new commit
+        7. return the oid of the new commit
+        
+    Args:
+        other (str): The name of the branch to merge
+    
+    returns:
+        None
+    """
     HEAD = data.get_ref('HEAD').value
     assert HEAD
     merge_base = get_merge_base(other, HEAD)
@@ -208,6 +319,21 @@ def merge(other):
 
 
 def get_merge_base(oid1, oid2):
+    """
+    Get the merge base of the two commits
+
+    Args:
+        oid1 (str): The oid of the first commit
+        oid2 (str): The oid of the second commit
+
+    steps:
+        1. Get the commit with the oid1
+        2. Get the commit with the oid2
+        3. Get the common ancestor of the two commits
+        4. return the oid of the common ancestor
+    Returns:
+        The oid of the merge base
+    """
     parents1 = list(iter_commits_and_parents({oid1}))
 
     for oid in iter_commits_and_parents({oid2}):
@@ -216,11 +342,31 @@ def get_merge_base(oid1, oid2):
 
 
 def create_tag(name, oid):
+    """
+    Create a tag with the given name and oid
+    
+    Args:
+        name (str): The name of the tag
+        oid (str): The oid of the commit to tag
+    
+    Returns:
+        None
+    """
     data.update_ref(f'refs/tags/{name}',
                     data.RefValue(symbolic=False, value=oid))
 
 
 def create_branch(name, oid):
+    """
+    create a branch with the given name and oid
+    
+    Args:
+        name (str): The name of the branch
+        oid (str): The oid of the commit to branch from
+    
+    Returns:
+        None
+    """
     data.update_ref(f'refs/heads/{name}',
                     data.RefValue(symbolic=False, value=oid))
 
