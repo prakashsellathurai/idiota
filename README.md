@@ -2,12 +2,14 @@
 idiota is a minimal version control system built on 
 python
 
+![PyPI](https://img.shields.io/pypi/v/idiota)
+![Upload Python Package](https://github.com/prakashsellathurai/idiota/workflows/Upload%20Python%20Package/badge.svg)
+
 ## Etymology
 The project is named after the Spanish word "idiota", from Latin idiōta (“idiot”). Since the goal of 
 this project is to be a stupidly simple version control system(vcs).
 
-![PyPI](https://img.shields.io/pypi/v/idiota)
-![Upload Python Package](https://github.com/prakashsellathurai/idiota/workflows/Upload%20Python%20Package/badge.svg)
+
 
 ## Development:
 For development purposes.To setup the package in your local environment  Run 
