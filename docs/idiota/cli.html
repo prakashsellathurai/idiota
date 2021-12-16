@@ -70,7 +70,7 @@
                     <a class="function" href="#branch">branch</a>
             </li>
             <li>
-                    <a class="function" href="#k">k</a>
+                    <a class="function" href="#viz">viz</a>
             </li>
             <li>
                     <a class="function" href="#status">status</a>
@@ -207,8 +207,8 @@
     <span class="n">branch_parser</span><span class="o">.</span><span class="n">add_argument</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">)</span>
     <span class="n">branch_parser</span><span class="o">.</span><span class="n">add_argument</span> <span class="p">(</span><span class="s1">&#39;start_point&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">oid</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="n">help</span><span class="o">=</span><span class="s1">&#39;Commit to start branch from&#39;</span><span class="p">)</span>
 
-    <span class="n">k_parser</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="n">add_parser</span> <span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Create a key&#39;</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ke&#39;</span><span class="p">])</span>
-    <span class="n">k_parser</span><span class="o">.</span><span class="n">set_defaults</span> <span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">k_parser</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="n">add_parser</span> <span class="p">(</span><span class="s1">&#39;show-graph&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;visualize the commits&#39;</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;viz&#39;</span><span class="p">])</span>
+    <span class="n">k_parser</span><span class="o">.</span><span class="n">set_defaults</span> <span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">viz</span><span class="p">)</span>
 
     <span class="n">status_parser</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="n">add_parser</span> <span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Show status&#39;</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">])</span>
     <span class="n">status_parser</span><span class="o">.</span><span class="n">set_defaults</span> <span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
@@ -340,7 +340,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">k</span> <span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">viz</span> <span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">dot</span> <span class="o">=</span> <span class="s1">&#39;digraph commits {</span><span class="se">\n</span><span class="s1">&#39;</span>
     <span class="n">oids</span> <span class="o">=</span> <span class="nb">set</span> <span class="p">()</span>
     <span class="k">for</span> <span class="n">refname</span><span class="p">,</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">iter_refs</span> <span class="p">(</span><span class="n">deref</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -357,10 +357,7 @@
 
     <span class="n">dot</span> <span class="o">+=</span> <span class="s1">&#39;}&#39;</span>
     <span class="nb">print</span> <span class="p">(</span><span class="n">dot</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span> <span class="p">(</span>
-        <span class="p">[</span><span class="s1">&#39;dot&#39;</span><span class="p">,</span> <span class="s1">&#39;-Tgtk&#39;</span><span class="p">,</span> <span class="s1">&#39;/dev/stdin&#39;</span><span class="p">],</span>
-        <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span> <span class="k">as</span> <span class="n">proc</span><span class="p">:</span>
-        <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span> <span class="p">(</span><span class="n">dot</span><span class="o">.</span><span class="n">encode</span> <span class="p">())</span>
+    
 
 
 
@@ -520,8 +517,8 @@
     <span class="n">branch_parser</span><span class="o">.</span><span class="n">add_argument</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">)</span>
     <span class="n">branch_parser</span><span class="o">.</span><span class="n">add_argument</span> <span class="p">(</span><span class="s1">&#39;start_point&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">oid</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="n">help</span><span class="o">=</span><span class="s1">&#39;Commit to start branch from&#39;</span><span class="p">)</span>
 
-    <span class="n">k_parser</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="n">add_parser</span> <span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Create a key&#39;</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ke&#39;</span><span class="p">])</span>
-    <span class="n">k_parser</span><span class="o">.</span><span class="n">set_defaults</span> <span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">k_parser</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="n">add_parser</span> <span class="p">(</span><span class="s1">&#39;show-graph&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;visualize the commits&#39;</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;viz&#39;</span><span class="p">])</span>
+    <span class="n">k_parser</span><span class="o">.</span><span class="n">set_defaults</span> <span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">viz</span><span class="p">)</span>
 
     <span class="n">status_parser</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="n">add_parser</span> <span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Show status&#39;</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">])</span>
     <span class="n">status_parser</span><span class="o">.</span><span class="n">set_defaults</span> <span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
@@ -797,17 +794,17 @@
     
 
                 </section>
-                <section id="k">
-                            <div class="attr function"><a class="headerlink" href="#k">#&nbsp;&nbsp</a>
+                <section id="viz">
+                            <div class="attr function"><a class="headerlink" href="#viz">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">k</span><span class="signature">(args)</span>:
+            <span class="name">viz</span><span class="signature">(args)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">k</span> <span class="p">(</span><span class="n">args</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">viz</span> <span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">dot</span> <span class="o">=</span> <span class="s1">&#39;digraph commits {</span><span class="se">\n</span><span class="s1">&#39;</span>
     <span class="n">oids</span> <span class="o">=</span> <span class="nb">set</span> <span class="p">()</span>
     <span class="k">for</span> <span class="n">refname</span><span class="p">,</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">iter_refs</span> <span class="p">(</span><span class="n">deref</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -824,10 +821,6 @@
 
     <span class="n">dot</span> <span class="o">+=</span> <span class="s1">&#39;}&#39;</span>
     <span class="nb">print</span> <span class="p">(</span><span class="n">dot</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span> <span class="p">(</span>
-        <span class="p">[</span><span class="s1">&#39;dot&#39;</span><span class="p">,</span> <span class="s1">&#39;-Tgtk&#39;</span><span class="p">,</span> <span class="s1">&#39;/dev/stdin&#39;</span><span class="p">],</span>
-        <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span> <span class="k">as</span> <span class="n">proc</span><span class="p">:</span>
-        <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span> <span class="p">(</span><span class="n">dot</span><span class="o">.</span><span class="n">encode</span> <span class="p">())</span>
 </pre></div>
 
         </details>

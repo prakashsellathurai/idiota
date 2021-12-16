@@ -512,15 +512,23 @@
 
 
 <span class="k">def</span> <span class="nf">iter_branch_names</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Iterate over the names of all branches</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">refname</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">iter_refs</span><span class="p">(</span><span class="s1">&#39;refs/heads/&#39;</span><span class="p">):</span>
         <span class="k">yield</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">refname</span><span class="p">,</span> <span class="s1">&#39;refs/heads/&#39;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">is_branch</span><span class="p">(</span><span class="n">branch</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Check if the branch exists</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get_ref</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;refs/heads/</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
 
 <span class="k">def</span> <span class="nf">get_branch_name</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Get the name of the current branch</span>
+<span class="sd">    returns:</span>
+<span class="sd">        The name of the current branch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">HEAD</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_ref</span><span class="p">(</span><span class="s1">&#39;HEAD&#39;</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">HEAD</span><span class="o">.</span><span class="n">symbolic</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -533,6 +541,9 @@
 
 
 <span class="k">def</span> <span class="nf">get_commit</span><span class="p">(</span><span class="n">oid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    get commit by oid </span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">parents</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="n">commit</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">oid</span><span class="p">,</span> <span class="s1">&#39;commit&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
@@ -551,6 +562,9 @@
 
 
 <span class="k">def</span> <span class="nf">iter_commits_and_parents</span><span class="p">(</span><span class="n">oids</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    iterator to find common ancestor among oids</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">oids</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">oids</span><span class="p">)</span>
     <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
@@ -615,7 +629,9 @@
 
 
 <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">filenames</span><span class="p">):</span>
-
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    add file hashes to index</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">add_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="c1"># Normalize path</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -1290,13 +1306,17 @@ Returns:
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">iter_branch_names</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Iterate over the names of all branches</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">refname</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">iter_refs</span><span class="p">(</span><span class="s1">&#39;refs/heads/&#39;</span><span class="p">):</span>
         <span class="k">yield</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">refname</span><span class="p">,</span> <span class="s1">&#39;refs/heads/&#39;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Iterate over the names of all branches</p>
+</div>
+
 
                 </section>
                 <section id="is_branch">
@@ -1310,12 +1330,16 @@ Returns:
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">is_branch</span><span class="p">(</span><span class="n">branch</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Check if the branch exists</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get_ref</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;refs/heads/</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Check if the branch exists</p>
+</div>
+
 
                 </section>
                 <section id="get_branch_name">
@@ -1329,6 +1353,10 @@ Returns:
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_branch_name</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Get the name of the current branch</span>
+<span class="sd">    returns:</span>
+<span class="sd">        The name of the current branch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">HEAD</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_ref</span><span class="p">(</span><span class="s1">&#39;HEAD&#39;</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">HEAD</span><span class="o">.</span><span class="n">symbolic</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -1339,7 +1367,11 @@ Returns:
 
         </details>
 
-    
+            <div class="docstring"><p>Get the name of the current branch
+returns:
+    The name of the current branch</p>
+</div>
+
 
                 </section>
                 <section id="Commit">
@@ -1424,6 +1456,9 @@ Returns:
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_commit</span><span class="p">(</span><span class="n">oid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    get commit by oid </span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">parents</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="n">commit</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">oid</span><span class="p">,</span> <span class="s1">&#39;commit&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
@@ -1443,7 +1478,9 @@ Returns:
 
         </details>
 
-    
+            <div class="docstring"><p>get commit by oid</p>
+</div>
+
 
                 </section>
                 <section id="iter_commits_and_parents">
@@ -1457,6 +1494,9 @@ Returns:
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">iter_commits_and_parents</span><span class="p">(</span><span class="n">oids</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    iterator to find common ancestor among oids</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">oids</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">oids</span><span class="p">)</span>
     <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
@@ -1476,7 +1516,9 @@ Returns:
 
         </details>
 
-    
+            <div class="docstring"><p>iterator to find common ancestor among oids</p>
+</div>
+
 
                 </section>
                 <section id="iter_objects_in_commits">
@@ -1566,7 +1608,9 @@ Returns:
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">filenames</span><span class="p">):</span>
-
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    add file hashes to index</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">add_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="c1"># Normalize path</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -1593,7 +1637,9 @@ Returns:
 
         </details>
 
-    
+            <div class="docstring"><p>add file hashes to index</p>
+</div>
+
 
                 </section>
                 <section id="is_ignored">

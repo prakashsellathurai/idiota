@@ -31,12 +31,6 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
-                    <a class="function" href="#change_git_dir">change_git_dir</a>
-            </li>
-            <li>
-                    <a class="function" href="#init">init</a>
-            </li>
-            <li>
                     <a class="class" href="#RefValue">RefValue</a>
                             <ul class="memberlist">
                         <li>
@@ -50,6 +44,12 @@
                         </li>
                 </ul>
 
+            </li>
+            <li>
+                    <a class="function" href="#change_git_dir">change_git_dir</a>
+            </li>
+            <li>
+                    <a class="function" href="#init">init</a>
             </li>
             <li>
                     <a class="function" href="#update_ref">update_ref</a>
@@ -136,12 +136,18 @@ tag  - A  object that represents a meta info.</p>
 
 
 <span class="n">GIT_DIR</span> <span class="o">=</span> <span class="kc">None</span>
-
+<span class="n">RefValue</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;RefValue&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;symbolic&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">])</span>
 
 <span class="nd">@contextmanager</span>
-<span class="k">def</span> <span class="nf">change_git_dir</span><span class="p">(</span><span class="n">new_dir</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">change_git_dir</span><span class="p">(</span><span class="n">new_dir</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Change the current git directory</span>
+<span class="sd">    </span>
+<span class="sd">    Args:   </span>
+<span class="sd">        new_dir (str): new git directory</span>
+<span class="sd">        </span>
+<span class="sd">    Yields:</span>
+<span class="sd">        str: old git directory</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">GIT_DIR</span>
     <span class="n">old_dir</span> <span class="o">=</span> <span class="n">GIT_DIR</span>
@@ -150,18 +156,31 @@ tag  - A  object that represents a meta info.</p>
     <span class="n">GIT_DIR</span> <span class="o">=</span> <span class="n">old_dir</span>
 
 
-<span class="k">def</span> <span class="nf">init</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">init</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create .idiota directory</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">GIT_DIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/objects&#39;</span><span class="p">)</span>
 
 
-<span class="n">RefValue</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;RefValue&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;symbolic&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">update_ref</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">update_ref</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">deref</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Update a ref</span>
+<span class="sd">    </span>
+<span class="sd">    Args:   </span>
+<span class="sd">        ref (str): ref name</span>
+<span class="sd">        value (str): ref value</span>
+<span class="sd">        deref (bool): dereference symbolic refs</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: check if ref exists</span>
     <span class="c1"># TODO: check if value is valid</span>
     <span class="c1"># TODO: check if ref is symbolic</span>
@@ -181,7 +200,7 @@ tag  - A  object that represents a meta info.</p>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">get_ref</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">get_ref</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RefValue</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot; Get a ref value</span>
 
 <span class="sd">    Args:</span>
@@ -193,13 +212,22 @@ tag  - A  object that represents a meta info.</p>
     <span class="k">return</span> <span class="n">_get_ref_internal</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">delete_ref</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">delete_ref</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot; Delete a ref&quot;&quot;&quot;</span>
     <span class="n">ref</span> <span class="o">=</span> <span class="n">_get_ref_internal</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_ref_internal</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_ref_internal</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RefValue</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Get a ref value</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        ref (str): ref name</span>
+<span class="sd">        deref (bool): dereference symbolic refs</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        RefValue (str): ref value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ref_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s1">&#39;</span>
     <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">ref_path</span><span class="p">):</span>
@@ -216,6 +244,15 @@ tag  - A  object that represents a meta info.</p>
 
 
 <span class="k">def</span> <span class="nf">iter_refs</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Iterate over refs</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        prefix (str): ref prefix</span>
+<span class="sd">        deref (bool): dereference symbolic refs</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Iterator[Tup(str, RefValue)]: ref name and ref value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">refs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;HEAD&#39;</span><span class="p">,</span> <span class="s1">&#39;MERGE_HEAD&#39;</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/refs/&#39;</span><span class="p">):</span>
         <span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">GIT_DIR</span><span class="p">)</span>
@@ -231,6 +268,11 @@ tag  - A  object that represents a meta info.</p>
 
 <span class="nd">@contextmanager</span>
 <span class="k">def</span> <span class="nf">get_index</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Get index</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        Index: index</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">index</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/index&#39;</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/index&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -242,7 +284,18 @@ tag  - A  object that represents a meta info.</p>
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">hash_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="s1">&#39;blob&#39;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">hash_object</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="s1">&#39;blob&#39;</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Hash an object</span>
+<span class="sd">    </span>
+<span class="sd">    uses: Sha1 algorithm</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        data (bytes): object data</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str: object id</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="n">type_</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">data</span>
     <span class="n">oid</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/objects/</span><span class="si">{</span><span class="n">oid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
@@ -250,7 +303,17 @@ tag  - A  object that represents a meta info.</p>
     <span class="k">return</span> <span class="n">oid</span>
 
 
-<span class="k">def</span> <span class="nf">get_object</span><span class="p">(</span><span class="n">oid</span><span class="p">,</span> <span class="n">expected</span><span class="o">=</span><span class="s1">&#39;blob&#39;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_object</span><span class="p">(</span><span class="n">oid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">expected</span><span class="o">=</span><span class="s1">&#39;blob&#39;</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    get an object</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        oid (str): object id</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        bytes: object data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/objects/</span><span class="si">{</span><span class="n">oid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
@@ -263,11 +326,30 @@ tag  - A  object that represents a meta info.</p>
     <span class="k">return</span> <span class="n">content</span>
 
 
-<span class="k">def</span> <span class="nf">object_exists</span><span class="p">(</span><span class="n">oid</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">object_exists</span><span class="p">(</span><span class="n">oid</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    checks if object of given id exists in the repository</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        oid (str): object id</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if object exists</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/objects/</span><span class="si">{</span><span class="n">oid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">fetch_object_if_missing</span><span class="p">(</span><span class="n">oid</span><span class="p">,</span> <span class="n">remote_git_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    fetch object from remote repository if it is not present in local repository</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        oid (str): object id</span>
+<span class="sd">        remote_git_dir (str): remote git directory</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">object_exists</span><span class="p">(</span><span class="n">oid</span><span class="p">):</span>
         <span class="k">return</span>
     <span class="n">remote_git_dir</span> <span class="o">+=</span> <span class="s1">&#39;/.ugit&#39;</span>
@@ -276,6 +358,16 @@ tag  - A  object that represents a meta info.</p>
 
 
 <span class="k">def</span> <span class="nf">push_object</span><span class="p">(</span><span class="n">oid</span><span class="p">,</span> <span class="n">remote_git_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    push object to remote repository</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        oid (str): object id</span>
+<span class="sd">        remote_git_dir (str): remote git directory</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">remote_git_dir</span> <span class="o">+=</span> <span class="s1">&#39;/.ugit&#39;</span>
     <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/objects/</span><span class="si">{</span><span class="n">oid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">remote_git_dir</span><span class="si">}</span><span class="s1">/objects/</span><span class="si">{</span><span class="n">oid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -284,61 +376,6 @@ tag  - A  object that represents a meta info.</p>
         </details>
 
             </section>
-                <section id="change_git_dir">
-                            <div class="attr function"><a class="headerlink" href="#change_git_dir">#&nbsp;&nbsp</a>
-
-                <div class="decorator">@contextmanager</div>
-
-            <span class="def">def</span>
-            <span class="name">change_git_dir</span><span class="signature">(new_dir)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="nd">@contextmanager</span>
-<span class="k">def</span> <span class="nf">change_git_dir</span><span class="p">(</span><span class="n">new_dir</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Change the current git directory</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">global</span> <span class="n">GIT_DIR</span>
-    <span class="n">old_dir</span> <span class="o">=</span> <span class="n">GIT_DIR</span>
-    <span class="n">GIT_DIR</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">new_dir</span><span class="si">}</span><span class="s1">/.idiota&#39;</span>
-    <span class="k">yield</span>
-    <span class="n">GIT_DIR</span> <span class="o">=</span> <span class="n">old_dir</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Change the current git directory</p>
-</div>
-
-
-                </section>
-                <section id="init">
-                            <div class="attr function"><a class="headerlink" href="#init">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">init</span><span class="signature">()</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">init</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create .idiota directory</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">GIT_DIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/objects&#39;</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Create .idiota directory</p>
-</div>
-
-
-                </section>
                 <section id="RefValue">
                                 <div class="attr class">
         <a class="headerlink" href="#RefValue">#&nbsp;&nbsp</a>
@@ -399,17 +436,100 @@ tag  - A  object that represents a meta info.</p>
                                 </dl>
                             </div>
                 </section>
+                <section id="change_git_dir">
+                            <div class="attr function"><a class="headerlink" href="#change_git_dir">#&nbsp;&nbsp</a>
+
+                <div class="decorator">@contextmanager</div>
+
+            <span class="def">def</span>
+            <span class="name">change_git_dir</span><span class="signature">(new_dir) -&gt; None</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">change_git_dir</span><span class="p">(</span><span class="n">new_dir</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Change the current git directory</span>
+<span class="sd">    </span>
+<span class="sd">    Args:   </span>
+<span class="sd">        new_dir (str): new git directory</span>
+<span class="sd">        </span>
+<span class="sd">    Yields:</span>
+<span class="sd">        str: old git directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">GIT_DIR</span>
+    <span class="n">old_dir</span> <span class="o">=</span> <span class="n">GIT_DIR</span>
+    <span class="n">GIT_DIR</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">new_dir</span><span class="si">}</span><span class="s1">/.idiota&#39;</span>
+    <span class="k">yield</span>
+    <span class="n">GIT_DIR</span> <span class="o">=</span> <span class="n">old_dir</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Change the current git directory</p>
+
+<p>Args: <br />
+    new_dir (str): new git directory</p>
+
+<p>Yields:
+    str: old git directory</p>
+</div>
+
+
+                </section>
+                <section id="init">
+                            <div class="attr function"><a class="headerlink" href="#init">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">init</span><span class="signature">() -&gt; None</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">init</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create .idiota directory</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">GIT_DIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/objects&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Create .idiota directory</p>
+
+<p>Returns:
+    None</p>
+</div>
+
+
+                </section>
                 <section id="update_ref">
                             <div class="attr function"><a class="headerlink" href="#update_ref">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">update_ref</span><span class="signature">(ref, value, deref=True)</span>:
+            <span class="name">update_ref</span><span class="signature">(ref, value, deref: bool = True) -&gt; None</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">update_ref</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">update_ref</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">deref</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Update a ref</span>
+<span class="sd">    </span>
+<span class="sd">    Args:   </span>
+<span class="sd">        ref (str): ref name</span>
+<span class="sd">        value (str): ref value</span>
+<span class="sd">        deref (bool): dereference symbolic refs</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: check if ref exists</span>
     <span class="c1"># TODO: check if value is valid</span>
     <span class="c1"># TODO: check if ref is symbolic</span>
@@ -431,7 +551,17 @@ tag  - A  object that represents a meta info.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Update a ref</p>
+
+<p>Args: <br />
+    ref (str): ref name
+    value (str): ref value
+    deref (bool): dereference symbolic refs</p>
+
+<p>Returns:
+    None</p>
+</div>
+
 
                 </section>
                 <section id="get_ref">
@@ -439,12 +569,12 @@ tag  - A  object that represents a meta info.</p>
 
         
             <span class="def">def</span>
-            <span class="name">get_ref</span><span class="signature">(ref, deref=True) -&gt; str</span>:
+            <span class="name">get_ref</span><span class="signature">(ref, deref=True) -&gt; <a href="#RefValue">idiota.data.RefValue</a></span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_ref</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_ref</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RefValue</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot; Get a ref value</span>
 
 <span class="sd">    Args:</span>
@@ -474,12 +604,12 @@ Returns:
 
         
             <span class="def">def</span>
-            <span class="name">delete_ref</span><span class="signature">(ref, deref=True)</span>:
+            <span class="name">delete_ref</span><span class="signature">(ref, deref=True) -&gt; None</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">delete_ref</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">delete_ref</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot; Delete a ref&quot;&quot;&quot;</span>
     <span class="n">ref</span> <span class="o">=</span> <span class="n">_get_ref_internal</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deref</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -503,6 +633,15 @@ Returns:
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">iter_refs</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">deref</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Iterate over refs</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        prefix (str): ref prefix</span>
+<span class="sd">        deref (bool): dereference symbolic refs</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Iterator[Tup(str, RefValue)]: ref name and ref value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">refs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;HEAD&#39;</span><span class="p">,</span> <span class="s1">&#39;MERGE_HEAD&#39;</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/refs/&#39;</span><span class="p">):</span>
         <span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">GIT_DIR</span><span class="p">)</span>
@@ -518,7 +657,16 @@ Returns:
 
         </details>
 
-    
+            <div class="docstring"><p>Iterate over refs</p>
+
+<p>Args:
+    prefix (str): ref prefix
+    deref (bool): dereference symbolic refs</p>
+
+<p>Returns:
+    Iterator[Tup(str, RefValue)]: ref name and ref value</p>
+</div>
+
 
                 </section>
                 <section id="get_index">
@@ -534,6 +682,11 @@ Returns:
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="nd">@contextmanager</span>
 <span class="k">def</span> <span class="nf">get_index</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Get index</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        Index: index</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">index</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/index&#39;</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/index&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -547,7 +700,12 @@ Returns:
 
         </details>
 
-    
+            <div class="docstring"><p>Get index</p>
+
+<p>Yields:
+    Index: index</p>
+</div>
+
 
                 </section>
                 <section id="hash_object">
@@ -555,12 +713,23 @@ Returns:
 
         
             <span class="def">def</span>
-            <span class="name">hash_object</span><span class="signature">(data, type_=&#39;blob&#39;)</span>:
+            <span class="name">hash_object</span><span class="signature">(data: object, type_=&#39;blob&#39;) -&gt; str</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">hash_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="s1">&#39;blob&#39;</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">hash_object</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="s1">&#39;blob&#39;</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Hash an object</span>
+<span class="sd">    </span>
+<span class="sd">    uses: Sha1 algorithm</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        data (bytes): object data</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str: object id</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="n">type_</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">data</span>
     <span class="n">oid</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/objects/</span><span class="si">{</span><span class="n">oid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
@@ -570,7 +739,17 @@ Returns:
 
         </details>
 
-    
+            <div class="docstring"><p>Hash an object</p>
+
+<p>uses: Sha1 algorithm</p>
+
+<p>Args:
+    data (bytes): object data</p>
+
+<p>Returns:
+    str: object id</p>
+</div>
+
 
                 </section>
                 <section id="get_object">
@@ -578,12 +757,22 @@ Returns:
 
         
             <span class="def">def</span>
-            <span class="name">get_object</span><span class="signature">(oid, expected=&#39;blob&#39;)</span>:
+            <span class="name">get_object</span><span class="signature">(oid: str, expected=&#39;blob&#39;) -&gt; object</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_object</span><span class="p">(</span><span class="n">oid</span><span class="p">,</span> <span class="n">expected</span><span class="o">=</span><span class="s1">&#39;blob&#39;</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_object</span><span class="p">(</span><span class="n">oid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">expected</span><span class="o">=</span><span class="s1">&#39;blob&#39;</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    get an object</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        oid (str): object id</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        bytes: object data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/objects/</span><span class="si">{</span><span class="n">oid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
@@ -598,7 +787,15 @@ Returns:
 
         </details>
 
-    
+            <div class="docstring"><p>get an object</p>
+
+<p>Args:
+    oid (str): object id</p>
+
+<p>Returns:
+    bytes: object data</p>
+</div>
+
 
                 </section>
                 <section id="object_exists">
@@ -606,18 +803,35 @@ Returns:
 
         
             <span class="def">def</span>
-            <span class="name">object_exists</span><span class="signature">(oid)</span>:
+            <span class="name">object_exists</span><span class="signature">(oid: bool) -&gt; bool</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">object_exists</span><span class="p">(</span><span class="n">oid</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">object_exists</span><span class="p">(</span><span class="n">oid</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    checks if object of given id exists in the repository</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        oid (str): object id</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if object exists</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/objects/</span><span class="si">{</span><span class="n">oid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>checks if object of given id exists in the repository</p>
+
+<p>Args:
+    oid (str): object id</p>
+
+<p>Returns:
+    bool: True if object exists</p>
+</div>
+
 
                 </section>
                 <section id="fetch_object_if_missing">
@@ -631,6 +845,16 @@ Returns:
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">fetch_object_if_missing</span><span class="p">(</span><span class="n">oid</span><span class="p">,</span> <span class="n">remote_git_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    fetch object from remote repository if it is not present in local repository</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        oid (str): object id</span>
+<span class="sd">        remote_git_dir (str): remote git directory</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">object_exists</span><span class="p">(</span><span class="n">oid</span><span class="p">):</span>
         <span class="k">return</span>
     <span class="n">remote_git_dir</span> <span class="o">+=</span> <span class="s1">&#39;/.ugit&#39;</span>
@@ -640,7 +864,16 @@ Returns:
 
         </details>
 
-    
+            <div class="docstring"><p>fetch object from remote repository if it is not present in local repository</p>
+
+<p>Args:
+    oid (str): object id
+    remote_git_dir (str): remote git directory</p>
+
+<p>Returns:
+    None</p>
+</div>
+
 
                 </section>
                 <section id="push_object">
@@ -654,6 +887,16 @@ Returns:
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">push_object</span><span class="p">(</span><span class="n">oid</span><span class="p">,</span> <span class="n">remote_git_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    push object to remote repository</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        oid (str): object id</span>
+<span class="sd">        remote_git_dir (str): remote git directory</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">remote_git_dir</span> <span class="o">+=</span> <span class="s1">&#39;/.ugit&#39;</span>
     <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GIT_DIR</span><span class="si">}</span><span class="s1">/objects/</span><span class="si">{</span><span class="n">oid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">remote_git_dir</span><span class="si">}</span><span class="s1">/objects/</span><span class="si">{</span><span class="n">oid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -661,7 +904,16 @@ Returns:
 
         </details>
 
-    
+            <div class="docstring"><p>push object to remote repository</p>
+
+<p>Args:
+    oid (str): object id
+    remote_git_dir (str): remote git directory</p>
+
+<p>Returns:
+    None</p>
+</div>
+
 
                 </section>
     </main>
