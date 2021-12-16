@@ -91,8 +91,8 @@ def parse_args ():
     branch_parser.add_argument ('name', nargs='?')
     branch_parser.add_argument ('start_point', default='@', type=oid, nargs='?',help='Commit to start branch from')
 
-    k_parser = commands.add_parser ('k', help='Create a key', aliases=['ke'])
-    k_parser.set_defaults (func=k)
+    k_parser = commands.add_parser ('show-graph', help='visualize the commits', aliases=['viz'])
+    k_parser.set_defaults (func=viz)
 
     status_parser = commands.add_parser ('status', help='Show status', aliases=['st'])
     status_parser.set_defaults (func=status)
@@ -224,7 +224,7 @@ def branch (args):
 
 
 
-def k (args):
+def viz (args):
     dot = 'digraph commits {\n'
     oids = set ()
     for refname, ref in data.iter_refs (deref=False):
@@ -241,10 +241,7 @@ def k (args):
 
     dot += '}'
     print (dot)
-    with subprocess.Popen (
-        ['dot', '-Tgtk', '/dev/stdin'],
-        stdin=subprocess.PIPE) as proc:
-        proc.communicate (dot.encode ())
+    
 
 
 
