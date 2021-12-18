@@ -16,7 +16,7 @@ For development purposes.To setup the package in your local environment  Run
 
 ``python setup.py develop``
 ## Documentation
-check /Doc for code documentation
+check https://prakashsellathurai.github.io/idiota/ for code documentation
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
